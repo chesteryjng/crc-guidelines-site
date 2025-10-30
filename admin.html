@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin • CRC Guidelines</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="assets/favicon.png">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <div class="logo">CRC</div>
+    <div class="title">
+      <h1>Admin: Upload Guidelines</h1>
+      <p class="muted">PDF/DOCX or scanned images. OCR is supported.</p>
+    </div>
+  </div>
+  <nav>
+    <a href="index.html" class="link">Chat</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section class="card">
+    <h2>Connection</h2>
+    <label>Backend API Base URL
+      <input id="apiBase" type="url" placeholder="https://your-railway-app.up.railway.app" />
+    </label>
+    <label>Admin Secret (must match server ADMIN_SECRET)
+      <input id="secret" type="password" placeholder="••••••••" />
+    </label>
+  </section>
+
+  <section class="card">
+    <h2>Upload a Guideline</h2>
+    <label>Title (e.g., NCCN Colon v2025)
+      <input id="title" type="text" required />
+    </label>
+    <label>Document (PDF / DOCX / PNG / JPG / TIFF)
+      <input id="file" type="file" accept=".pdf,.docx,.png,.jpg,.jpeg,.tif,.tiff" required />
+    </label>
+    <label>OCR languages (comma-separated, e.g., eng or eng,chi_sim)
+      <input id="langs" type="text" value="eng" />
+    </label>
+
+    <div class="input-row">
+      <button id="uploadBtn">Upload & Index</button>
+      <button id="saveConn" type="button" class="ghost">Save connection</button>
+    </div>
+    <pre id="log" class="log"></pre>
+  </section>
+</main>
+
+<footer class="foot">© <span id="y"></span> CRC Guidance</footer>
+<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<script>
+  const apiBaseEl = document.getElementById('apiBase');
+  const secretEl  = document.getElementById('secret');
+  const titleEl   = document.getElementById('title');
+  const fileEl    = document.getElementById('file');
+  const langsEl   = document.getElementById('langs');
+  const logEl     = document.getElementById('log');
+
+  // Load saved values
+  apiBaseEl.value = localStorage.getItem('API_BASE') || '';
+  secretEl.value  = localStorage.getItem('ADMIN_SECRET') || '';
+
+  document.getElementById('saveConn').onclick = () => {
+    const apiBase = apiBaseEl.value.trim();
+    const secret  = secretEl.value.trim();
+    if (!apiBase || !secret) {
+      logEl.textContent = 'Please enter API Base and Secret.';
+      return;
+    }
+    localStorage.setItem('API_BASE', apiBase);
+    localStorage.setItem('ADMIN_SECRET', secret);
+    logEl.textContent = 'Saved connection settings.';
+  };
+
+  document.getElementById('uploadBtn').onclick = async () => {
+    const apiBase = (apiBaseEl.value || localStorage.getItem('API_BASE') || '').trim();
+    const secret  = (secretEl.value  || localStorage.getItem('ADMIN_SECRET') || '').trim();
+    const title   = titleEl.value.trim();
+    const file    = fileEl.files[0];
+    const langs   = langsEl.value.trim();
+
+    if (!apiBase || !secret || !title || !file) {
+      logEl.textContent = 'Please fill all fields.';
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append('secret', secret);
+    fd.append('title', title);
+    fd.append('langs', langs);
+    fd.append('file', file);
+
+    logEl.textContent = 'Uploading & indexing...';
+    try {
+      const res = await fetch(apiBase + '/api/upload', { method: 'POST', body: fd });
+      const data = await res.json().catch(()=>({}));
+      logEl.textContent = res.ok
+        ? JSON.stringify(data, null, 2)
+        : ('Error:\n' + JSON.stringify(data, null, 2));
+    } catch (e) {
+      logEl.textContent = 'Network error. Check your API base.';
+    }
+  };
+</script>
+</body>
+</html>
