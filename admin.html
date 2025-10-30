@@ -1,114 +1,375 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Admin • CRC Guidelines</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="assets/favicon.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin: Upload Guidelines</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #d0d7de;
+      --text-main: #0f172a;
+      --text-dim: #475569;
+      --accent: #1d4ed8;
+      --accent-text: #ffffff;
+      --radius-lg: 0.75rem;
+      --radius-sm: 0.5rem;
+      --shadow-card: 0 20px 40px -8px rgba(15, 23, 42, 0.12);
+      --code-bg: #0f172a;
+      --code-fg: #e2e8f0;
+    }
+
+    body {
+      background-color: var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      padding: 1rem 1.25rem 0.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-circle {
+      background-color: var(--text-main);
+      color: var(--card-bg);
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1;
+      border-radius: 999px;
+      padding: 0.6rem 0.6rem;
+      font-family: ui-monospace, monospace;
+      min-width: 2rem;
+      text-align: center;
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .header-title {
+      font-size: 1rem;
+    }
+    .header-sub {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--text-dim);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1rem 4rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      padding: 1rem 1rem 1.25rem;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .muted {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-top: 0;
+    }
+
+    .small {
+      font-size: 0.8rem;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1rem;
+    }
+
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.25rem;
+      display: block;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      font-size: 0.9rem;
+      padding: 0.6rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      min-width: 10rem;
+      outline: none;
+      background-color: #fff;
+      color: var(--text-main);
+    }
+
+    input[type="file"] {
+      font-size: 0.8rem;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      font-size: 0.9rem;
+      line-height: 1.2rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    button.primary {
+      background-color: var(--accent);
+      color: var(--accent-text);
+    }
+
+    button.secondary {
+      background-color: #fff;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    .log {
+      background-color: var(--code-bg);
+      color: var(--code-fg);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.8rem;
+      margin-top: 1rem;
+      max-height: 200px;
+      overflow-x: auto;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 640px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-<header class="bar">
-  <div class="brand">
-    <div class="logo">CRC</div>
-    <div class="title">
-      <h1>Admin: Upload Guidelines</h1>
-      <p class="muted">PDF/DOCX or scanned images. OCR is supported.</p>
-    </div>
+<header>
+  <div class="logo-circle">CRC</div>
+  <div class="header-text">
+    <div class="header-title">Admin: Upload Guidelines</div>
+    <div class="header-sub">PDF/DOCX or scanned images. OCR is supported.</div>
   </div>
-  <nav>
-    <a href="index.html" class="link">Chat</a>
-  </nav>
 </header>
 
 <main class="container">
 
+  <!-- CONNECTION CARD -->
   <section class="card">
     <h2>Connection</h2>
-    <label>Backend API Base URL
-      <input id="apiBase" type="url" placeholder="https://your-railway-app.up.railway.app" />
-    </label>
-    <label>Admin Secret (must match server ADMIN_SECRET)
-      <input id="secret" type="password" placeholder="••••••••" />
-    </label>
+    <p class="muted small">Backend API Base URL and Admin Secret are stored locally in your browser only.</p>
+
+    <div class="input-grid">
+      <div>
+        <label>Backend API Base URL</label>
+        <input id="apiBase" type="text" placeholder="https://your-service.onrender.com" />
+      </div>
+
+      <div>
+        <label>Admin Secret (must match server ADMIN_SECRET)</label>
+        <input id="adminSecret" type="password" placeholder="••••••••" />
+      </div>
+    </div>
   </section>
 
+  <!-- UPLOAD CARD -->
   <section class="card">
     <h2>Upload a Guideline</h2>
-    <label>Title (e.g., NCCN Colon v2025)
-      <input id="title" type="text" required />
-    </label>
-    <label>Document (PDF / DOCX / PNG / JPG / TIFF)
-      <input id="file" type="file" accept=".pdf,.docx,.png,.jpg,.jpeg,.tif,.tiff" required />
-    </label>
-    <label>OCR languages (comma-separated, e.g., eng or eng,chi_sim)
-      <input id="langs" type="text" value="eng" />
-    </label>
+
+    <div class="input-grid">
+      <div>
+        <label>Title (e.g., NCCN Colon v2025)</label>
+        <input id="titleInput" type="text" placeholder="NCCN Colon v2025" />
+      </div>
+
+      <div>
+        <label>Document (PDF / DOCX / PNG / JPG / TIFF)</label>
+        <input id="fileInput" type="file" />
+      </div>
+
+      <div>
+        <label>OCR languages (comma-separated, e.g., eng or eng,chi_sim)</label>
+        <input id="langInput" type="text" value="eng" />
+      </div>
+    </div>
 
     <div class="input-row">
-      <button id="uploadBtn">Upload & Index</button>
-      <button id="saveConn" type="button" class="ghost">Save connection</button>
+      <button id="uploadBtn" class="primary">Upload &amp; Index</button>
+      <button id="saveConnBtn" class="secondary">Save connection</button>
     </div>
-    <pre id="log" class="log"></pre>
+
+    <pre id="log" class="log">No action yet.</pre>
   </section>
+
+  <!-- LIST GUIDELINES CARD -->
+  <section class="card">
+    <h2>Current Guidelines in System</h2>
+    <p class="muted small">Click refresh to see all guidelines that are currently indexed on the backend.</p>
+
+    <div class="input-row">
+      <button id="refreshBtn" class="secondary">Refresh guideline list</button>
+    </div>
+
+    <pre id="listLog" class="log">No data loaded yet.</pre>
+  </section>
+
 </main>
 
-<footer class="foot">© <span id="y"></span> CRC Guidance</footer>
-<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<footer>
+  © 2025 CRC Guidance
+</footer>
+
 <script>
+  // grab DOM refs
   const apiBaseEl = document.getElementById('apiBase');
-  const secretEl  = document.getElementById('secret');
-  const titleEl   = document.getElementById('title');
-  const fileEl    = document.getElementById('file');
-  const langsEl   = document.getElementById('langs');
-  const logEl     = document.getElementById('log');
+  const secretEl = document.getElementById('adminSecret');
+  const titleEl = document.getElementById('titleInput');
+  const fileEl = document.getElementById('fileInput');
+  const langEl = document.getElementById('langInput');
+  const logEl = document.getElementById('log');
+  const saveConnBtn = document.getElementById('saveConnBtn');
+  const uploadBtn = document.getElementById('uploadBtn');
 
-  // Load saved values
-  apiBaseEl.value = localStorage.getItem('API_BASE') || '';
-  secretEl.value  = localStorage.getItem('ADMIN_SECRET') || '';
+  const refreshBtn = document.getElementById('refreshBtn');
+  const listLog = document.getElementById('listLog');
 
-  document.getElementById('saveConn').onclick = () => {
-    const apiBase = apiBaseEl.value.trim();
-    const secret  = secretEl.value.trim();
-    if (!apiBase || !secret) {
-      logEl.textContent = 'Please enter API Base and Secret.';
-      return;
-    }
-    localStorage.setItem('API_BASE', apiBase);
-    localStorage.setItem('ADMIN_SECRET', secret);
+  // load any saved connection info from browser localStorage
+  function loadConnection() {
+    const savedBase = localStorage.getItem('API_BASE') || '';
+    const savedSecret = localStorage.getItem('ADMIN_SECRET') || '';
+    if (savedBase) apiBaseEl.value = savedBase;
+    if (savedSecret) secretEl.value = savedSecret;
+  }
+  loadConnection();
+
+  // save connection info
+  saveConnBtn.onclick = () => {
+    const baseVal = apiBaseEl.value.trim();
+    const secVal = secretEl.value.trim();
+    localStorage.setItem('API_BASE', baseVal);
+    localStorage.setItem('ADMIN_SECRET', secVal);
     logEl.textContent = 'Saved connection settings.';
   };
 
-  document.getElementById('uploadBtn').onclick = async () => {
-    const apiBase = (apiBaseEl.value || localStorage.getItem('API_BASE') || '').trim();
-    const secret  = (secretEl.value  || localStorage.getItem('ADMIN_SECRET') || '').trim();
-    const title   = titleEl.value.trim();
-    const file    = fileEl.files[0];
-    const langs   = langsEl.value.trim();
+  // helper: log helper
+  function setLog(obj) {
+    if (typeof obj === 'string') {
+      logEl.textContent = obj;
+    } else {
+      logEl.textContent = JSON.stringify(obj, null, 2);
+    }
+  }
 
-    if (!apiBase || !secret || !title || !file) {
-      logEl.textContent = 'Please fill all fields.';
+  // upload button handler
+  uploadBtn.onclick = async () => {
+    const apiBase = (apiBaseEl.value || '').trim();
+    const adminSecret = (secretEl.value || '').trim();
+    const title = (titleEl.value || '').trim();
+    const langs = (langEl.value || '').trim();
+    const file = fileEl.files[0];
+
+    if (!apiBase || !adminSecret || !title || !file) {
+      setLog({ error: 'Missing required fields (url, secret, title, file)' });
       return;
     }
 
-    const fd = new FormData();
-    fd.append('secret', secret);
-    fd.append('title', title);
-    fd.append('langs', langs);
-    fd.append('file', file);
+    const formData = new FormData();
+    formData.append('secret', adminSecret);
+    formData.append('title', title);
+    formData.append('langs', langs || 'eng');
+    formData.append('file', file);
 
-    logEl.textContent = 'Uploading & indexing...';
+    setLog('Uploading...');
+
     try {
-      const res = await fetch(apiBase + '/api/upload', { method: 'POST', body: fd });
-      const data = await res.json().catch(()=>({}));
-      logEl.textContent = res.ok
-        ? JSON.stringify(data, null, 2)
-        : ('Error:\n' + JSON.stringify(data, null, 2));
-    } catch (e) {
-      logEl.textContent = 'Network error. Check your API base.';
+      const resp = await fetch(apiBase + '/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        setLog({ error: 'Upload failed', status: resp.status, data });
+        return;
+      }
+
+      setLog(data);
+    } catch (err) {
+      setLog({ error: 'Network error', detail: String(err) });
+    }
+  };
+
+  // refresh guideline list
+  refreshBtn.onclick = async () => {
+    const apiBase = (apiBaseEl.value || localStorage.getItem('API_BASE') || '').trim();
+    if (!apiBase) {
+      listLog.textContent = 'Please set and save connection first.';
+      return;
+    }
+
+    listLog.textContent = 'Loading...';
+
+    try {
+      const res = await fetch(apiBase + '/api/sources');
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        listLog.textContent = 'Error:\n' + JSON.stringify(data, null, 2);
+        return;
+      }
+
+      listLog.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      listLog.textContent = 'Network error trying to reach /api/sources';
     }
   };
 </script>
