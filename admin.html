@@ -1,508 +1,81 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CRC Guidance Admin</title>
-<style>
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", Roboto, "Helvetica Neue", sans-serif;
-    background: radial-gradient(circle at 10% 20%, #f9fbff 0%, #eef2f7 100%);
-    color: #111;
-    line-height: 1.4;
-    padding: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  h1,h2 {
-    font-weight: 600;
-    color: #0f172a;
-    margin-bottom: 8px;
-  }
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 20px 40px -10px rgba(15,23,42,.15);
-    border: 1px solid rgba(15,23,42,.06);
-    padding: 20px 24px;
-    margin-bottom: 24px;
-  }
-  label {
-    display: block;
-    font-size: .8rem;
-    font-weight: 500;
-    color: #334155;
-    margin-bottom: 4px;
-  }
-  input[type="text"],
-  input[type="password"],
-  input[type="file"],
-  textarea {
-    width: 100%;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background-color: #fff;
-    padding: 10px 12px;
-    font-size: .9rem;
-    color: #0f172a;
-    box-sizing: border-box;
-  }
-  button {
-    appearance: none;
-    border: 0;
-    border-radius: 8px;
-    font-size: .9rem;
-    font-weight: 500;
-    cursor: pointer;
-    line-height: 1.2;
-    padding: 10px 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-  }
-  .btn-primary {
-    background-color: #1e40af;
-    color: #fff;
-  }
-  .btn-secondary {
-    background-color: #fff;
-    color: #1e40af;
-    border: 1px solid #1e40af;
-  }
-  .btn-danger {
-    background-color: #dc2626;
-    color: #fff;
-  }
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .row > .col {
-    flex: 1;
-    min-width: 250px;
-  }
-  pre {
-    background: #0f172a;
-    color: #fff;
-    font-size: .8rem;
-    line-height: 1.4;
-    padding: 16px;
-    border-radius: 8px;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-    min-height: 120px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .85rem;
-  }
-  th {
-    text-align: left;
-    font-weight: 600;
-    color: #0f172a;
-    border-bottom: 2px solid #cbd5e1;
-    padding: 8px;
-    font-size: .8rem;
-  }
-  td {
-    border-bottom: 1px solid #e2e8f0;
-    padding: 8px;
-    vertical-align: top;
-    font-size: .8rem;
-    color: #1e293b;
-    word-break: break-word;
-  }
-  .smallmono {
-    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-    font-size: .7rem;
-    color: #475569;
-    background: #f1f5f9;
-    border-radius: 4px;
-    padding: 2px 4px;
-  }
-  footer {
-    text-align: center;
-    font-size: .7rem;
-    color: #64748b;
-    margin-top: 40px;
-  }
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Admin: Upload Guidelines</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <meta name="default-api-base" content="https://crc-guidelines-bot-server.onrender.com" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <div class="logo">CRC</div>
+        <div class="title">
+          <div class="name">Admin: Upload Guidelines</div>
+          <div class="tagline">PDF/DOCX or scanned images. OCR is supported.</div>
+        </div>
+      </div>
+      <nav class="actions">
+        <a class="admin-link" href="./index.html">Back</a>
+      </nav>
+    </header>
 
-<h1>CRC Guidance Admin</h1>
-<p style="color:#475569;font-size:.85rem;margin-top:-4px;">
-  Upload CRC guidelines (PDF, DOCX, PNG/JPG/TIFF), index them, view all sources, and delete old sources.
-  OCR is supported for images using languages you specify (e.g. <code>eng,chi_sim</code>).
-</p>
+    <main class="container">
+      <section class="card">
+        <h2>Connection</h2>
+        <div class="field">
+          <label>Backend API Base URL</label>
+          <input id="apiBaseInput" type="text" placeholder="https://..." />
+        </div>
+        <div class="field">
+          <label>Admin Secret (must match server ADMIN_SECRET)</label>
+          <input id="adminSecretInput" type="password" />
+        </div>
+        <div class="row">
+          <button id="saveConnBtn" type="button">Save connection</button>
+          <span id="connSaveMsg" class="muted"></span>
+        </div>
+      </section>
 
-<!-- Connection / Secrets -->
-<div class="card">
-  <h2>Connection</h2>
-  <p style="font-size:.8rem;color:#475569;margin-top:0">
-    These values are stored locally in your browser only.
-  </p>
+      <section class="card">
+        <h2>Upload a Guideline</h2>
 
-  <div class="row">
-    <div class="col">
-      <label>Backend API Base URL</label>
-      <input id="apiBaseUrl" type="text" placeholder="https://your-service.onrender.com" />
-    </div>
-    <div class="col">
-      <label>Admin Secret (must match server ADMIN_SECRET)</label>
-      <input id="adminSecret" type="password" placeholder="••••••••" />
-    </div>
-  </div>
+        <div class="field">
+          <label>Title (e.g., NCCN Colon v2025)</label>
+          <input id="titleInput" type="text" />
+        </div>
 
-  <div style="margin-top:12px;">
-    <button class="btn-secondary" id="saveConnectionBtn">Save connection</button>
-  </div>
+        <div class="field">
+          <label>Document (PDF / DOCX / PNG / JPG / TIFF)</label>
+          <input id="fileInput" type="file" />
+        </div>
 
-  <pre id="connectionStatus">{}</pre>
-</div>
+        <div class="field">
+          <label>OCR languages (comma-separated, e.g., <code>eng</code> or <code>eng,chi_sim</code>)</label>
+          <input id="langsInput" type="text" placeholder="eng" />
+        </div>
 
-<!-- Upload -->
-<div class="card">
-  <h2>Upload a Guideline</h2>
+        <div class="row">
+          <button id="uploadBtn" type="button">Upload &amp; Index</button>
+        </div>
 
-  <div class="row">
-    <div class="col">
-      <label>Title (e.g., NCCN Colon v2025)</label>
-      <input id="titleInput" type="text" placeholder="CSCO 2023" />
-    </div>
+        <pre id="uploadOutput" class="code"></pre>
+      </section>
 
-    <div class="col">
-      <label>Document (PDF / DOCX / PNG / JPG / TIFF)</label>
-      <input id="fileInput" type="file" />
-    </div>
-  </div>
+      <section class="card">
+        <h2>Current Guidelines in System</h2>
+        <div class="row">
+          <button id="refreshBtn" type="button">Refresh guideline list</button>
+        </div>
+        <div id="guidelineList"></div>
+      </section>
+    </main>
 
-  <div class="row" style="margin-top:16px;">
-    <div class="col">
-      <label>OCR languages (comma-separated, e.g. eng or eng,chi_sim)</label>
-      <input id="langsInput" type="text" placeholder="eng,chi_sim" />
-    </div>
-  </div>
-
-  <div style="margin-top:16px;">
-    <button class="btn-primary" id="uploadBtn">Upload &amp; Index</button>
-  </div>
-
-  <pre id="uploadResult">{}</pre>
-</div>
-
-<!-- Current Guidelines + Delete -->
-<div class="card">
-  <h2>Current Guidelines in System</h2>
-  <p style="font-size:.8rem;color:#475569;margin-top:0">
-    Click “Refresh” to update. You can delete any source permanently.
-  </p>
-
-  <div style="margin-bottom:12px;">
-    <button class="btn-secondary" id="refreshBtn">Refresh guideline list</button>
-  </div>
-
-  <div style="overflow-x:auto;">
-    <table id="guidelinesTable">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Filename</th>
-          <th>Uploaded At</th>
-          <th>Lang</th>
-          <th>Chunks</th>
-          <th>Source ID</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody id="guidelinesBody">
-        <!-- rows injected here -->
-      </tbody>
-    </table>
-  </div>
-
-  <pre id="deleteResult">{}</pre>
-</div>
-
-<footer>
-  © 2025 CRC Guidance — internal admin only
-</footer>
-
-<script>
-(function () {
-  const apiBaseUrlInput = document.getElementById("apiBaseUrl");
-  const adminSecretInput = document.getElementById("adminSecret");
-  const titleInput = document.getElementById("titleInput");
-  const fileInput = document.getElementById("fileInput");
-  const langsInput = document.getElementById("langsInput");
-
-  const connectionStatusPre = document.getElementById("connectionStatus");
-  const uploadResultPre = document.getElementById("uploadResult");
-  const deleteResultPre = document.getElementById("deleteResult");
-
-  const saveConnectionBtn = document.getElementById("saveConnectionBtn");
-  const uploadBtn = document.getElementById("uploadBtn");
-  const refreshBtn = document.getElementById("refreshBtn");
-
-  const guidelinesBody = document.getElementById("guidelinesBody");
-
-  // --- Load saved connection on startup ---
-  function loadLocalConfig() {
-    const savedBase = localStorage.getItem("crc_api_base") || "";
-    const savedSecret = localStorage.getItem("crc_admin_secret") || "";
-    apiBaseUrlInput.value = savedBase;
-    adminSecretInput.value = savedSecret;
-    connectionStatusPre.textContent = JSON.stringify(
-      { ok: true, baseUrl: savedBase ? savedBase : "(not set)" },
-      null,
-      2
-    );
-  }
-
-  loadLocalConfig();
-
-  // --- Save connection settings ---
-  saveConnectionBtn.addEventListener("click", () => {
-    const baseUrl = apiBaseUrlInput.value.trim();
-    const secret = adminSecretInput.value.trim();
-
-    localStorage.setItem("crc_api_base", baseUrl);
-    localStorage.setItem("crc_admin_secret", secret);
-
-    connectionStatusPre.textContent = JSON.stringify(
-      { saved: true, baseUrl, hasSecret: secret ? true : false },
-      null,
-      2
-    );
-  });
-
-  // --- Helper: get config ---
-  function getConfig() {
-    return {
-      baseUrl: localStorage.getItem("crc_api_base") || "",
-      secret: localStorage.getItem("crc_admin_secret") || "",
-    };
-  }
-
-  // --- Upload + Index ---
-  uploadBtn.addEventListener("click", async () => {
-    const { baseUrl } = getConfig();
-    const fileObj = fileInput.files[0];
-    const titleVal = titleInput.value.trim();
-    const langsVal = langsInput.value.trim();
-
-    if (!baseUrl) {
-      uploadResultPre.textContent = JSON.stringify(
-        { error: "Base URL not set" },
-        null,
-        2
-      );
-      return;
-    }
-    if (!titleVal) {
-      uploadResultPre.textContent = JSON.stringify(
-        { error: "Title is required" },
-        null,
-        2
-      );
-      return;
-    }
-    if (!fileObj) {
-      uploadResultPre.textContent = JSON.stringify(
-        { error: "No file selected" },
-        null,
-        2
-      );
-      return;
-    }
-
-    const formData = new FormData();
-    // We send the uploaded file under the field name "docFile"
-    formData.append("docFile", fileObj);
-    formData.append("title", titleVal);
-    formData.append("langs", langsVal);
-
-    try {
-      const resp = await fetch(baseUrl + "/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await resp.json().catch(() => ({}));
-
-      uploadResultPre.textContent = JSON.stringify(
-        {
-          status: resp.status,
-          data,
-        },
-        null,
-        2
-      );
-
-      // after successful upload, refresh the list
-      if (resp.ok && data && data.ok) {
-        fetchGuidelines();
-      }
-    } catch (err) {
-      uploadResultPre.textContent = JSON.stringify(
-        {
-          error: "Upload failed",
-          detail: String(err),
-        },
-        null,
-        2
-      );
-    }
-  });
-
-  // --- Fetch guidelines list ---
-  async function fetchGuidelines() {
-    const { baseUrl } = getConfig();
-    if (!baseUrl) {
-      deleteResultPre.textContent = JSON.stringify(
-        { error: "Base URL not set for refresh" },
-        null,
-        2
-      );
-      return;
-    }
-
-    try {
-      const resp = await fetch(baseUrl + "/api/sources");
-      const data = await resp.json().catch(() => []);
-
-      // render rows
-      guidelinesBody.innerHTML = "";
-      (data || []).forEach((doc) => {
-        const tr = document.createElement("tr");
-
-        const tdTitle = document.createElement("td");
-        tdTitle.textContent = doc.title || "";
-        tr.appendChild(tdTitle);
-
-        const tdFile = document.createElement("td");
-        tdFile.textContent = doc.filename || "";
-        tr.appendChild(tdFile);
-
-        const tdUploaded = document.createElement("td");
-        tdUploaded.textContent = doc.uploadedAt || "";
-        tr.appendChild(tdUploaded);
-
-        const tdLang = document.createElement("td");
-        tdLang.textContent = doc.lang || "";
-        tr.appendChild(tdLang);
-
-        const tdChunks = document.createElement("td");
-        tdChunks.textContent = doc.chunks != null ? String(doc.chunks) : "";
-        tr.appendChild(tdChunks);
-
-        const tdId = document.createElement("td");
-        const code = document.createElement("div");
-        code.className = "smallmono";
-        code.textContent = doc.sourceId || "";
-        tdId.appendChild(code);
-        tr.appendChild(tdId);
-
-        const tdDelete = document.createElement("td");
-        const delBtn = document.createElement("button");
-        delBtn.className = "btn-danger";
-        delBtn.textContent = "Delete";
-        delBtn.style.fontSize = ".7rem";
-        delBtn.addEventListener("click", () => {
-          deleteGuideline(doc.sourceId);
-        });
-        tdDelete.appendChild(delBtn);
-        tr.appendChild(tdDelete);
-
-        guidelinesBody.appendChild(tr);
-      });
-
-      deleteResultPre.textContent = JSON.stringify(
-        {
-          ok: true,
-          count: (data || []).length,
-        },
-        null,
-        2
-      );
-    } catch (err) {
-      deleteResultPre.textContent = JSON.stringify(
-        {
-          error: "Failed to fetch sources",
-          detail: String(err),
-        },
-        null,
-        2
-      );
-    }
-  }
-
-  refreshBtn.addEventListener("click", fetchGuidelines);
-
-  // --- Delete guideline ---
-  async function deleteGuideline(sourceId) {
-    const { baseUrl, secret } = getConfig();
-    if (!baseUrl) {
-      deleteResultPre.textContent = JSON.stringify(
-        { error: "Base URL not set for delete" },
-        null,
-        2
-      );
-      return;
-    }
-    if (!secret) {
-      deleteResultPre.textContent = JSON.stringify(
-        { error: "Admin secret not set" },
-        null,
-        2
-      );
-      return;
-    }
-
-    if (!window.confirm("Are you sure you want to delete this guideline?")) {
-      return;
-    }
-
-    try {
-      const resp = await fetch(baseUrl + "/api/source/" + encodeURIComponent(sourceId), {
-        method: "DELETE",
-        headers: {
-          "x-admin-secret": secret,
-        },
-      });
-      const data = await resp.json().catch(() => ({}));
-
-      deleteResultPre.textContent = JSON.stringify(
-        {
-          status: resp.status,
-          data,
-        },
-        null,
-        2
-      );
-
-      // refresh the list if successful
-      if (resp.ok && data && data.ok) {
-        fetchGuidelines();
-      }
-    } catch (err) {
-      deleteResultPre.textContent = JSON.stringify(
-        {
-          error: "Delete failed",
-          detail: String(err),
-        },
-        null,
-        2
-      );
-    }
-  }
-
-  // auto-refresh list on load
-  fetchGuidelines();
-})();
-</script>
-</body>
+    <script src="./js/app.js"></script>
+  </body>
 </html>
+
