@@ -1,59 +1,63 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Colorectal Cancer Guidance</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Ask questions about colorectal cancer. Answers come strictly from uploaded clinical guidelines." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="assets/favicon.png">
-</head>
-<body>
-<header class="bar">
-  <div class="brand">
-    <div class="logo">CRC</div>
-    <div class="title">
-      <h1>Colorectal Cancer Guidance</h1>
-      <p class="muted">Evidence is sourced only from the guidelines you upload.</p>
-    </div>
-  </div>
-  <nav>
-    <a href="admin.html" class="link">Admin</a>
-  </nav>
-</header>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Colorectal Cancer Guidance</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <!-- (Optional) You can set a default here; JS also has an internal default. -->
+    <meta name="default-api-base" content="https://crc-guidelines-bot-server.onrender.com" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <div class="logo">CRC</div>
+        <div class="title">
+          <div class="name">Colorectal Cancer Guidance</div>
+          <div class="tagline">
+            Evidence is sourced only from the guidelines you upload.
+          </div>
+        </div>
+      </div>
+      <nav class="actions">
+        <a class="admin-link" href="./admin.html">Admin</a>
+      </nav>
+    </header>
 
-<main class="container">
-  <section class="card">
-    <h2>Ask about CRC</h2>
-    <p class="muted">Example: <em>What are surveillance intervals after polypectomy?</em></p>
-    <div id="chat" class="chat" role="log" aria-live="polite"></div>
-    <form id="chatForm" class="input-row" autocomplete="off">
-      <input id="q" type="text" placeholder="Type your question…" required aria-label="Your question">
-      <button type="submit">Ask</button>
-    </form>
-  </section>
+    <main class="container">
+      <section class="chat">
+        <h1>Ask about CRC</h1>
+        <p class="hint">
+          Example: <em>What are surveillance intervals after polypectomy?</em>
+        </p>
 
-  <section class="card info">
-    <h3>Disclaimer</h3>
-    <p class="muted small">
-      This tool echoes text found in the uploaded clinical practice guidelines.
-      If your question is not covered, you’ll be advised to consult a healthcare
-      professional. This is not a substitute for clinical judgment.
-    </p>
-  </section>
-</main>
+        <div id="chatWindow" class="chat-window"></div>
 
-<footer class="foot">© <span id="y"></span> CRC Guidance Site Draft 1 by Chester YJ Ng </footer>
-<script>
-  document.getElementById('y').textContent = new Date().getFullYear();
-</script>
-<script>
-  // Populated via admin.html and saved in localStorage so we don't hardcode secrets
-  window.API_BASE = localStorage.getItem('API_BASE') || 'https://YOUR-BACKEND-URL';
-</script>
-<script src="app.js"></script>
-</body>
+        <form id="askForm" class="ask-row">
+          <input
+            id="askInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+          />
+          <button id="askBtn" type="submit">Ask</button>
+        </form>
+      </section>
+
+      <section class="disclaimer">
+        <h2>Disclaimer</h2>
+        <p>
+          This tool echoes text found in the uploaded clinical practice
+          guidelines. If your question is not covered, you’ll be advised to
+          consult a healthcare professional. This is not a substitute for
+          clinical judgment.
+        </p>
+      </section>
+    </main>
+
+    <script src="./js/app.js"></script>
+  </body>
 </html>
