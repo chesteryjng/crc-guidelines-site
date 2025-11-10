@@ -61,28 +61,11 @@
     justify-content: center;
     white-space: nowrap;
   }
-  .btn-primary {
-    background-color: #1e40af;
-    color: #fff;
-  }
-  .btn-secondary {
-    background-color: #fff;
-    color: #1e40af;
-    border: 1px solid #1e40af;
-  }
-  .btn-danger {
-    background-color: #dc2626;
-    color: #fff;
-  }
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .row > .col {
-    flex: 1;
-    min-width: 250px;
-  }
+  .btn-primary { background-color: #1e40af; color: #fff; }
+  .btn-secondary { background-color: #fff; color: #1e40af; border: 1px solid #1e40af; }
+  .btn-danger { background-color: #dc2626; color: #fff; }
+  .row { display: flex; flex-wrap: wrap; gap: 16px; }
+  .row > .col { flex: 1; min-width: 250px; }
   pre {
     background: #0f172a;
     color: #fff;
@@ -95,11 +78,7 @@
     word-break: break-word;
     min-height: 120px;
   }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .85rem;
-  }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
   th {
     text-align: left;
     font-weight: 600;
@@ -124,12 +103,7 @@
     border-radius: 4px;
     padding: 2px 4px;
   }
-  footer {
-    text-align: center;
-    font-size: .7rem;
-    color: #64748b;
-    margin-top: 40px;
-  }
+  footer { text-align: center; font-size: .7rem; color: #64748b; margin-top: 40px; }
 </style>
 </head>
 <body>
@@ -160,6 +134,7 @@
 
   <div style="margin-top:12px;">
     <button class="btn-secondary" id="saveConnectionBtn">Save connection</button>
+    <button class="btn-secondary" id="pingBtn" style="margin-left:8px;">Ping status</button>
   </div>
 
   <pre id="connectionStatus">{}</pre>
@@ -177,7 +152,7 @@
 
     <div class="col">
       <label>Document (PDF / DOCX / PNG / JPG / TIFF)</label>
-      <input id="fileInput" type="file" />
+      <input id="fileInput" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.tif,.tiff" />
     </div>
   </div>
 
@@ -234,6 +209,8 @@
 
 <script>
 (function () {
+  const DEFAULT_BASE = "https://crc-guidelines-bot-server.onrender.com";
+
   const apiBaseUrlInput = document.getElementById("apiBaseUrl");
   const adminSecretInput = document.getElementById("adminSecret");
   const titleInput = document.getElementById("titleInput");
@@ -245,6 +222,7 @@
   const deleteResultPre = document.getElementById("deleteResult");
 
   const saveConnectionBtn = document.getElementById("saveConnectionBtn");
+  const pingBtn = document.getElementById("pingBtn");
   const uploadBtn = document.getElementById("uploadBtn");
   const refreshBtn = document.getElementById("refreshBtn");
 
@@ -252,7 +230,7 @@
 
   // --- Load saved connection on startup ---
   function loadLocalConfig() {
-    const savedBase = localStorage.getItem("crc_api_base") || "";
+    const savedBase = localStorage.getItem("crc_api_base") || DEFAULT_BASE;
     const savedSecret = localStorage.getItem("crc_admin_secret") || "";
     apiBaseUrlInput.value = savedBase;
     adminSecretInput.value = savedSecret;
@@ -267,14 +245,14 @@
 
   // --- Save connection settings ---
   saveConnectionBtn.addEventListener("click", () => {
-    const baseUrl = apiBaseUrlInput.value.trim();
-    const secret = adminSecretInput.value.trim();
+    const baseUrl = (apiBaseUrlInput.value || "").trim();
+    const secret = (adminSecretInput.value || "").trim();
 
-    localStorage.setItem("crc_api_base", baseUrl);
+    localStorage.setItem("crc_api_base", baseUrl || DEFAULT_BASE);
     localStorage.setItem("crc_admin_secret", secret);
 
     connectionStatusPre.textContent = JSON.stringify(
-      { saved: true, baseUrl, hasSecret: secret ? true : false },
+      { saved: true, baseUrl: baseUrl || DEFAULT_BASE, hasSecret: !!secret },
       null,
       2
     );
@@ -283,45 +261,58 @@
   // --- Helper: get config ---
   function getConfig() {
     return {
-      baseUrl: localStorage.getItem("crc_api_base") || "",
+      baseUrl: localStorage.getItem("crc_api_base") || DEFAULT_BASE,
       secret: localStorage.getItem("crc_admin_secret") || "",
     };
   }
 
+  // --- Ping /status ---
+  async function ping() {
+    const { baseUrl } = getConfig();
+    try {
+      const r = await fetch(baseUrl + "/status", { method: "GET" });
+      const j = await r.json().catch(() => ({}));
+      connectionStatusPre.textContent = JSON.stringify(
+        { ok: r.ok, status: r.status, ...j, baseUrl },
+        null, 2
+      );
+    } catch (e) {
+      connectionStatusPre.textContent = JSON.stringify(
+        { ok: false, error: String(e), baseUrl },
+        null, 2
+      );
+    }
+  }
+  pingBtn.addEventListener("click", ping);
+  // Ping once on load
+  ping();
+
   // --- Upload + Index ---
   uploadBtn.addEventListener("click", async () => {
-    const { baseUrl } = getConfig();
+    const { baseUrl, secret } = getConfig();
     const fileObj = fileInput.files[0];
     const titleVal = titleInput.value.trim();
     const langsVal = langsInput.value.trim();
 
     if (!baseUrl) {
-      uploadResultPre.textContent = JSON.stringify(
-        { error: "Base URL not set" },
-        null,
-        2
-      );
+      uploadResultPre.textContent = JSON.stringify({ error: "Base URL not set" }, null, 2);
+      return;
+    }
+    if (!secret) {
+      uploadResultPre.textContent = JSON.stringify({ error: "Admin secret not set" }, null, 2);
       return;
     }
     if (!titleVal) {
-      uploadResultPre.textContent = JSON.stringify(
-        { error: "Title is required" },
-        null,
-        2
-      );
+      uploadResultPre.textContent = JSON.stringify({ error: "Title is required" }, null, 2);
       return;
     }
     if (!fileObj) {
-      uploadResultPre.textContent = JSON.stringify(
-        { error: "No file selected" },
-        null,
-        2
-      );
+      uploadResultPre.textContent = JSON.stringify({ error: "No file selected" }, null, 2);
       return;
     }
 
     const formData = new FormData();
-    // We send the uploaded file under the field name "docFile"
+    // Server expects "docFile" (your existing convention)
     formData.append("docFile", fileObj);
     formData.append("title", titleVal);
     formData.append("langs", langsVal);
@@ -329,31 +320,23 @@
     try {
       const resp = await fetch(baseUrl + "/api/upload", {
         method: "POST",
+        headers: { "x-admin-secret": secret },   // <-- include admin secret for upload
         body: formData,
       });
       const data = await resp.json().catch(() => ({}));
 
       uploadResultPre.textContent = JSON.stringify(
-        {
-          status: resp.status,
-          data,
-        },
-        null,
-        2
+        { status: resp.status, data },
+        null, 2
       );
 
-      // after successful upload, refresh the list
-      if (resp.ok && data && data.ok) {
+      if (resp.ok && data && (data.ok || data.sourceId || data.version)) {
         fetchGuidelines();
       }
     } catch (err) {
       uploadResultPre.textContent = JSON.stringify(
-        {
-          error: "Upload failed",
-          detail: String(err),
-        },
-        null,
-        2
+        { error: "Upload failed", detail: String(err) },
+        null, 2
       );
     }
   });
@@ -364,8 +347,7 @@
     if (!baseUrl) {
       deleteResultPre.textContent = JSON.stringify(
         { error: "Base URL not set for refresh" },
-        null,
-        2
+        null, 2
       );
       return;
     }
@@ -421,21 +403,13 @@
       });
 
       deleteResultPre.textContent = JSON.stringify(
-        {
-          ok: true,
-          count: (data || []).length,
-        },
-        null,
-        2
+        { ok: true, count: (data || []).length },
+        null, 2
       );
     } catch (err) {
       deleteResultPre.textContent = JSON.stringify(
-        {
-          error: "Failed to fetch sources",
-          detail: String(err),
-        },
-        null,
-        2
+        { error: "Failed to fetch sources", detail: String(err) },
+        null, 2
       );
     }
   }
@@ -448,16 +422,14 @@
     if (!baseUrl) {
       deleteResultPre.textContent = JSON.stringify(
         { error: "Base URL not set for delete" },
-        null,
-        2
+        null, 2
       );
       return;
     }
     if (!secret) {
       deleteResultPre.textContent = JSON.stringify(
         { error: "Admin secret not set" },
-        null,
-        2
+        null, 2
       );
       return;
     }
@@ -469,33 +441,22 @@
     try {
       const resp = await fetch(baseUrl + "/api/source/" + encodeURIComponent(sourceId), {
         method: "DELETE",
-        headers: {
-          "x-admin-secret": secret,
-        },
+        headers: { "x-admin-secret": secret },
       });
       const data = await resp.json().catch(() => ({}));
 
       deleteResultPre.textContent = JSON.stringify(
-        {
-          status: resp.status,
-          data,
-        },
-        null,
-        2
+        { status: resp.status, data },
+        null, 2
       );
 
-      // refresh the list if successful
       if (resp.ok && data && data.ok) {
         fetchGuidelines();
       }
     } catch (err) {
       deleteResultPre.textContent = JSON.stringify(
-        {
-          error: "Delete failed",
-          detail: String(err),
-        },
-        null,
-        2
+        { error: "Delete failed", detail: String(err) },
+        null, 2
       );
     }
   }
@@ -506,3 +467,4 @@
 </script>
 </body>
 </html>
+
