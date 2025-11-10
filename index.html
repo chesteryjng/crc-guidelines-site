@@ -8,8 +8,45 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="assets/favicon.png">
+  <!-- Optional: if styles.css doesn't exist, inline styles below still cover layout -->
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="icon" href="./assets/favicon.png">
+  <style>
+    :root {
+      --bg: #0f172a; --fg: #e2e8f0; --muted:#94a3b8;
+      --card:#0b1222; --stroke:#1f2a44; --accent:#1e3a8a;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; height:100%; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--fg); }
+    a { color:#93c5fd; text-decoration: none; }
+    .bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 18px; border-bottom:1px solid var(--stroke); background:#0a1222; position:sticky; top:0; z-index:10; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .logo { width:36px; height:36px; border-radius:10px; background:var(--accent); display:grid; place-items:center; font-weight:800; }
+    .title h1 { margin:0; font-size:1.15rem; }
+    .title .muted { margin:2px 0 0; color:var(--muted); font-size:.9rem; }
+    nav .link { padding:8px 12px; border:1px solid var(--stroke); border-radius:10px; }
+    .container { max-width:980px; margin: 22px auto; padding: 0 16px; }
+    .card { background:var(--card); border:1px solid var(--stroke); border-radius:14px; padding:16px; margin-bottom:16px; box-shadow:0 2px 6px rgba(0,0,0,.25); }
+    .card.info { opacity: .95; }
+    h2 { margin: 0 0 8px; font-size:1.2rem; }
+    h3 { margin: 0 0 8px; font-size:1.05rem; }
+    .muted { color:var(--muted); }
+    .small { font-size:.9rem; line-height:1.4; }
+    .chat { display:flex; flex-direction:column; gap:10px; height:60vh; overflow:auto; padding:10px; border:1px solid var(--stroke); border-radius:12px; background:#0a0f1d; }
+    .bubble { padding:10px 12px; border-radius:12px; max-width:80%; line-height:1.35; white-space:pre-wrap; word-wrap:break-word; }
+    .bubble.me { align-self:flex-end; background:var(--accent); }
+    .bubble.bot { align-self:flex-start; background:#152039; border:1px solid var(--stroke); }
+    .input-row { display:flex; gap:8px; margin-top:12px; }
+    .input-row input { flex:1; padding:12px 14px; border-radius:12px; border:1px solid var(--stroke); background:#0a0f1d; color:var(--fg); }
+    .input-row button { padding:12px 16px; border-radius:12px; border:1px solid var(--stroke); background:var(--accent); color:var(--fg); cursor:pointer; }
+    .foot { text-align:center; color:var(--muted); padding:16px; border-top:1px solid var(--stroke); }
+    .status { font-size:.9rem; color:var(--muted); margin-bottom:8px; }
+    @media (max-width: 640px) {
+      .bubble { max-width: 100%; }
+      .title h1 { font-size:1rem; }
+    }
+  </style>
 </head>
 <body>
 <header class="bar">
@@ -21,12 +58,13 @@
     </div>
   </div>
   <nav>
-    <a href="admin.html" class="link">Admin</a>
+    <a href="./admin.html" class="link">Admin</a>
   </nav>
 </header>
 
 <main class="container">
   <section class="card">
+    <div class="status">Backend: <code id="meta-endpoint"></code> • Status: <span id="meta-status">checking…</span></div>
     <h2>Ask about CRC</h2>
     <p class="muted">Example: <em>What are surveillance intervals after polypectomy?</em></p>
     <div id="chat" class="chat" role="log" aria-live="polite"></div>
@@ -46,14 +84,31 @@
   </section>
 </main>
 
-<footer class="foot">© <span id="y"></span> CRC Guidance Site Draft 1 by Chester YJ Ng </footer>
+<footer class="foot">© <span id="y"></span> CRC Guidance Site Draft 1 by Chester YJ Ng</footer>
+
 <script>
+  // Year
   document.getElementById('y').textContent = new Date().getFullYear();
+
+  // API base: localStorage override if you want, otherwise use public Render API.
+  const DEFAULT_API = 'https://crc-guidelines-bot-server.onrender.com';
+  window.API_BASE = localStorage.getItem('API_BASE') || DEFAULT_API;
+
+  // Show endpoint, ping status
+  document.getElementById('meta-endpoint').textContent = `${window.API_BASE}/chat`;
+  (async () => {
+    try {
+      const r = await fetch(`${window.API_BASE}/status`, { method: 'GET' });
+      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+      const j = await r.json();
+      document.getElementById('meta-status').textContent =
+        `v${j.version} • ${j.docCount} docs • ${j.lastUpdated}`;
+    } catch (e) {
+      document.getElementById('meta-status').textContent = `unreachable (${e.message})`;
+    }
+  })();
 </script>
-<script>
-  // Populated via admin.html and saved in localStorage so we don't hardcode secrets
-  window.API_BASE = localStorage.getItem('API_BASE') || 'https://YOUR-BACKEND-URL';
-</script>
-<script src="app.js"></script>
+
+<script src="./app.js"></script>
 </body>
 </html>
